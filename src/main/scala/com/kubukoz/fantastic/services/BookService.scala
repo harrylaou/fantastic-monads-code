@@ -31,7 +31,7 @@ class BookService(dao: BookDao) {
       ).mapN(Book)
     }
 
-    validatedBook(_).traverse(dao.saveBook)
+    bookToCreate => validatedBook(bookToCreate).traverse(dao.saveBook)
   }
 
   def rentBook(request: RentBookRequest): Future[RentResult] = {
