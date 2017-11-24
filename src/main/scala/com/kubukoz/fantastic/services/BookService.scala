@@ -25,7 +25,7 @@ class BookService(dao: BookDao) {
       val validateName = toCreate.name.valid.ensure(InvalidName)(s => (1 to 10).contains(s.length))
 
       (
-        BookId("-").validNel[BookCreateError],
+        BookId("-").validNel,
         validateISBN.toValidatedNel,
         validateName.toValidatedNel
       ).mapN(Book)
