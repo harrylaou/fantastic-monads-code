@@ -18,27 +18,31 @@ class BookService(dao: BookDao) {
 
   def findBooks(): Future[List[Book]] = dao.findAll()
 
-  def addBook(book: BookToCreate): Future[ValidatedNel[BookCreateError, BookId]] = {
-    val validatedBook: ValidatedNel[BookCreateError, Book] = {
-      val validateISBN = book.isbn.valid.ensure(InvalidISBN)(_.length == 10)
-      val validateName = book.name.valid.ensure(InvalidName)(s => (1 to 10).contains(s.length))
+  val addBook: BookToCreate => Future[ValidatedNel[BookCreateError, BookId]] = {
 
-      (BookId("-").validNel[BookCreateError],
+    val validatedBook: BookToCreate => ValidatedNel[BookCreateError, Book] = { toCreate =>
+      val validateISBN = toCreate.isbn.valid.ensure(InvalidISBN)(_.length == 10)
+      val validateName = toCreate.name.valid.ensure(InvalidName)(s => (1 to 10).contains(s.length))
+
+      (
+        BookId("-").validNel[BookCreateError],
         validateISBN.toValidatedNel,
-        validateName.toValidatedNel).mapN(Book)
+        validateName.toValidatedNel
+      ).mapN(Book)
     }
 
-    validatedBook.traverse(dao.saveBook)
+    validatedBook(_).traverse(dao.saveBook)
   }
 
   def rentBook(request: RentBookRequest): Future[RentResult] = {
-    val findF: Future[Option[Book]] = dao.findById(request.bookId)
-    val isRentedF: Future[Boolean]  = dao.isRented(request.bookId)
 
     def rentIfNotRented(isRented: Boolean): Future[RentResult] = {
       if (isRented) Future.successful(Left(BookAlreadyRented))
       else dao.rentBook(request.bookId).map(Right(_))
     }
+
+    val findF: Future[Option[Book]] = dao.findById(request.bookId)
+    val isRentedF: Future[Boolean]  = dao.isRented(request.bookId)
 
     for {
       bookEither <- findF.map(_.toRight(BookNotFound))
