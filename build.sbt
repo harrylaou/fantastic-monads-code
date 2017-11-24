@@ -1,9 +1,9 @@
 import sbt.addCompilerPlugin
 
 lazy val akkaHttpVersion      = "10.0.10"
-lazy val circeVersion         = "0.8.0"
-lazy val catsVersion          = "0.9.0"
-lazy val akkaHttpCirceVersion = "1.18.0"
+lazy val circeVersion         = "0.9.0-M1"
+lazy val catsVersion          = "1.0.0-RC1"
+lazy val akkaHttpCirceVersion = "1.19.0-M2"
 lazy val kindProjectorVersion = "0.9.4"
 lazy val pureconfigVersion    = "0.8.0"
 lazy val scalatestVersion     = "3.0.1"

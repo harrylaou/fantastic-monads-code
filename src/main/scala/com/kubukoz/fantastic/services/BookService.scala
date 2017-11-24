@@ -2,7 +2,7 @@ package com.kubukoz.fantastic.services
 
 import cats.data.ValidatedNel
 import cats.instances.future._
-import cats.syntax.cartesian._
+import cats.syntax.apply._
 import cats.syntax.validated._
 import com.kubukoz.fantastic.dao.BookDao
 import com.kubukoz.fantastic.data.Book
@@ -23,9 +23,9 @@ class BookService(dao: BookDao) {
       val validateISBN = book.isbn.valid.ensure(InvalidISBN)(_.length == 10)
       val validateName = book.name.valid.ensure(InvalidName)(s => (1 to 10).contains(s.length))
 
-      (BookId("-").validNel[BookCreateError] |@|
-        validateISBN.toValidatedNel |@|
-        validateName.toValidatedNel).map(Book)
+      (BookId("-").validNel[BookCreateError],
+        validateISBN.toValidatedNel,
+        validateName.toValidatedNel).mapN(Book)
     }
 
     validatedBook.traverse(dao.saveBook)
