@@ -22,7 +22,7 @@ trait BookDao {
 object MockBookDao extends BookDao {
   type IsRented = Boolean
 
-  var memory: Map[BookId, (Book, IsRented)] = Map(
+  private var memory: Map[BookId, (Book, IsRented)] = Map(
     BookId("1") -> (Book(BookId("1"), "1234567890", "FP in Scala") -> false),
     BookId("2") -> (Book(BookId("2"), "1234567891", "FP in Java")  -> true)
   )
