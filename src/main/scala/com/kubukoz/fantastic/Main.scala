@@ -4,13 +4,14 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import com.kubukoz.fantastic.dao.MockBookDao
+import com.kubukoz.fantastic.dao.{MockBookDao, RealBookDao}
 import com.kubukoz.fantastic.routes.MainRoutes
 import com.kubukoz.fantastic.services.BookService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.StdIn
 import scala.language.higherKinds
+import cats.instances.future._
 
 object Main extends MainRoutes {
   implicit private val system: ActorSystem             = ActorSystem("fantastic")
@@ -33,5 +34,5 @@ object Main extends MainRoutes {
     }
   }
 
-  override protected def bookService: BookService[Result] = new BookService[Result](MockBookDao)
+  override protected def bookService: BookService[Result] = new BookService[Result](new RealBookDao(null))
 }

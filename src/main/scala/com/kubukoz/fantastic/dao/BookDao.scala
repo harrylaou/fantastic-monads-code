@@ -3,6 +3,7 @@ package com.kubukoz.fantastic.dao
 import cats.Id
 import com.kubukoz.fantastic.data.{Book, BookId}
 
+import scala.concurrent.Future
 import scala.language.higherKinds
 import scala.util.Random
 
@@ -52,4 +53,19 @@ object MockBookDao extends BookDao[Id] {
     newBookId
   }
 
+}
+
+//e.g. Slick
+trait Database {}
+
+class RealBookDao(db: Database) extends BookDao[Future] {
+  override def findAll(): Future[List[Book]] = ???
+
+  override def isRented(bookId: BookId): Future[Boolean] = ???
+
+  override def findById(bookId: BookId): Future[Option[Book]] = ???
+
+  override def rentBook(bookId: BookId): Future[Unit] = ???
+
+  override def saveBook(book: Book): Future[BookId] = ???
 }

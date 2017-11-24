@@ -60,5 +60,5 @@ class BookService[F[_]](dao: BookDao[F])(implicit M: Monad[F]) {
   }
 
   final def rentBooks(request: List[RentBookRequest]): F[List[RentResult]] =
-    request.map(rentBook).sequence
+    request.traverse(rentBook)
 }

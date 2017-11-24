@@ -13,7 +13,8 @@ import com.kubukoz.fantastic.services.BookService
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.Encoder
 import io.circe.generic.auto._
-
+import scala.concurrent.ExecutionContext.Implicits.global
+import cats.instances.future._
 import scala.language.higherKinds
 
 trait MainRoutes {
