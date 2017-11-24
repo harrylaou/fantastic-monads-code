@@ -33,5 +33,5 @@ object Main extends MainRoutes {
     }
   }
 
-  override protected def bookService: BookService = new BookService(MockBookDao)
+  override protected def bookService: BookService[Result] = new BookService[Result](MockBookDao)
 }

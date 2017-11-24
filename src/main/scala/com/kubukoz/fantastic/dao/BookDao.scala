@@ -1,24 +1,25 @@
 package com.kubukoz.fantastic.dao
 
+import cats.Id
 import com.kubukoz.fantastic.data.{Book, BookId}
 
-import scala.concurrent.Future
+import scala.language.higherKinds
 import scala.util.Random
 
-trait BookDao {
+trait BookDao[F[_]] {
 
-  def findAll(): Future[List[Book]]
+  def findAll(): F[List[Book]]
 
-  def isRented(bookId: BookId): Future[Boolean]
+  def isRented(bookId: BookId): F[Boolean]
 
-  def findById(bookId: BookId): Future[Option[Book]]
+  def findById(bookId: BookId): F[Option[Book]]
 
-  def rentBook(bookId: BookId): Future[Unit]
+  def rentBook(bookId: BookId): F[Unit]
 
-  def saveBook(book: Book): Future[BookId]
+  def saveBook(book: Book): F[BookId]
 }
 
-object MockBookDao extends BookDao {
+object MockBookDao extends BookDao[Id] {
   type IsRented = Boolean
 
   private var memory: Map[BookId, (Book, IsRented)] = Map(
@@ -26,28 +27,29 @@ object MockBookDao extends BookDao {
     BookId("2") -> (Book(BookId("2"), "1234567891", "FP in Java")  -> true)
   )
 
-  override def findAll(): Future[List[Book]] = Future.successful(memory.values.map(_._1).toList)
+  override def findAll(): List[Book] = memory.values.map(_._1).toList
 
-  override def isRented(bookId: BookId): Future[Boolean] =
-    Future.successful(memory.get(bookId).fold(false)(_._2))
+  override def isRented(bookId: BookId): Boolean =
+    memory.get(bookId).fold(false)(_._2)
 
-  override def findById(bookId: BookId): Future[Option[Book]] =
-    Future.successful(memory.get(bookId).map(_._1))
+  override def findById(bookId: BookId): Option[Book] =
+    memory.get(bookId).map(_._1)
 
-  override def rentBook(bookId: BookId): Future[Unit] = {
+  override def rentBook(bookId: BookId): Unit = {
     memory.get(bookId).foreach {
       case (book, _) =>
         memory = memory.updated(bookId, book -> true)
     }
 
-    Future.successful(Unit)
+    Unit
   }
 
-  override def saveBook(book: Book): Future[BookId] = {
+  override def saveBook(book: Book): BookId = {
     val newBookId = BookId(Random.nextString(10)) //don't do this at home
 
     memory += (newBookId -> (book.copy(id = newBookId), false))
 
-    Future.successful(newBookId)
+    newBookId
   }
+
 }

@@ -4,18 +4,20 @@ import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import cats.Functor
 import cats.data.ValidatedNel
+import cats.syntax.functor._
+import com.kubukoz.fantastic.Result
 import com.kubukoz.fantastic.dto.{AppError, BookToCreate, RentBookRequest}
 import com.kubukoz.fantastic.services.BookService
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.Encoder
 import io.circe.generic.auto._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.language.higherKinds
 
 trait MainRoutes {
-  protected def bookService: BookService
+  protected def bookService: BookService[Result]
 
   val mainRoutes: Route = post {
     pathPrefix("rent") {
@@ -48,7 +50,8 @@ trait MainRoutes {
   }
 
   //todo define custom marshallers SOMEHOW?
-  def handleValidation[E <: AppError, T: Encoder](result: Future[ValidatedNel[E, T]]): Future[ToResponseMarshallable] = {
+  def handleValidation[F[_]: Functor, E <: AppError, T: Encoder](
+    result: F[ValidatedNel[E, T]]): F[ToResponseMarshallable] = {
     result.map {
       _.fold(
         e => (StatusCodes.BadRequest, e.toList.map(_.toString)),
