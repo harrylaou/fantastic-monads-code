@@ -1,7 +1,6 @@
 package com.kubukoz.fantastic.dao
 
-import com.kubukoz.fantastic.data.Book
-import com.kubukoz.fantastic.dto.BookId
+import com.kubukoz.fantastic.data.{Book, BookId}
 
 import scala.concurrent.Future
 import scala.util.Random

@@ -5,7 +5,7 @@ import cats.instances.future._
 import cats.syntax.apply._
 import cats.syntax.validated._
 import com.kubukoz.fantastic.dao.BookDao
-import com.kubukoz.fantastic.data.Book
+import com.kubukoz.fantastic.data.{Book, BookId}
 import com.kubukoz.fantastic.dto.BookCreateError.{InvalidISBN, InvalidName}
 import com.kubukoz.fantastic.dto.RentError.{BookAlreadyRented, BookNotFound}
 import com.kubukoz.fantastic.dto._
